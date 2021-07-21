@@ -1,0 +1,258 @@
+CONTROLLER
+
+sap.ui.define([
+	"sap/ui/core/mvc/Controller",
+	"sap/ui/model/odata/ODataModel",
+	"exrateutil/model/formatter",
+	"exrateutil/model/formatterToFloat",
+	"sap/m/MessageToast",
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator"
+],
+	/**
+	 * @param {typeof sap.ui.core.mvc.Controller} Controller
+	 */
+	function (Controller, oDataModel, formatter, formatterToFloat, MessageToast, 
+     	Filter, FilterOperator) {
+		"use strict";
+		var oModel, MainModel;
+		var currencykey = null;
+		var startdate = 7/5/21;
+		var enddate = new Date();
+		var sUrl = "/sap/opu/odata/sap/ZSP_C_EXRATE_SB/";
+
+
+		return Controller.extend("exrateutil.controller.AppView", {
+
+			formatter: formatter, formatterToFloat,
+
+			onInit: function() {
+
+				this.byId("startdate").setMaxDate(new Date());
+				this.byId("enddate").setMaxDate(new Date());
+
+				//oData Initialization
+				oModel = new sap.ui.model.odata.ODataModel(sUrl, {
+					useBatch: false
+					});
+				this.getView().setModel(oModel, "MainModel");	
+
+				var oVizFrame = this.getView().byId("idVizFrame");
+				oVizFrame.setModel(oModel);		
+			},
+
+			onSearch: function () {
+				oModel.callFunction('syncButton', { urlParameters:{
+						Currencykey : currencykey},
+						method:'POST'
+					 	})	
+						//transfer to onChange method to onSetCurrency later
+				var sMessage = "Synchronization was succesfull!";
+				MessageToast.show(sMessage);
+
+			},
+
+			onSetStartDate: function(oEvent){
+
+				startdate = oEvent.getParameters().value;
+				console.log(startdate);
+			},
+
+			onSetEndDate: function(oEvent){
+
+				enddate = oEvent.getParameters().value;
+				console.log(enddate);
+			},
+
+			onSetCurrency: function(oEvent){
+				
+				currencykey = oEvent.getParameters().value;
+				console.log(currencykey);				
+			},
+
+			onSelect: function(oEvent){
+
+
+				/* var sQuery = oEvent.getParameter("value");
+				var oBinding = oEvent.getSource().getBinding("ZSP_I_STORAGE");
+				oBinding.filter([
+					new sap.ui.model.Filter("CurrencyKey", sap.ui.model.FilterOperator.EQ, sQuery) 
+					//new sap.ui.model.Filter("column B", sap.ui.model.FilterOperator.Contains, sQuery)
+				]); */
+				
+				/* var oFilter=[], sQuery = oEvent.getParameters("query"),
+
+				oList = this.getView().byId("ZSP_I_STORAGE");
+				oBinding = oList.getBinding("currencykey");
+				
+				if (sQuery) {
+					oFilter.push(new Filter ("CurrencyKey", FilterOperator.EQ, sQuery))
+				} */
+			},
+
+			onChangeData: function(oEvent){	
+
+			}
+	});
+});
+
+VIEW
+
+<mvc:View
+    controllerName="exrateutil.controller.AppView"
+	height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+	xmlns:core="sap.ui.core" 
+	xmlns:f="sap.f"
+    xmlns:t="sap.ui.table" 
+	xmlns:viz="sap.viz.ui5.controls" 
+	xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds" 
+	xmlns:sample="test.controller.ChartsOverview"
+    xmlns:goals="test.view.goals"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:l="sap.ui.layout"
+	xmlns:lay="sap.ui.layout.BlockLayout"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified"
+	class="viewPadding"
+	>
+	
+	
+<App id="idApp">
+	<Page id="page" title="{i18n>title}" showHeader="false">
+
+	<l:VerticalLayout id="vlid" width="100%">
+		<l:BlockLayout id="blid" background="Dashboard">
+			<l:BlockLayoutRow>
+				<l:BlockLayoutCell title="Exchange Rate Utility">
+					<Toolbar>
+						<ToolbarSpacer/>
+							<DatePicker id="startdate" change="onSetStartDate" width="12%"/>
+							<DatePicker id="enddate" change="onSetEndDate" width="12%"/>
+							<ComboBox change = "onSetCurrency" maxWidth="12%" value='USD'>
+								<items>
+									<core:Item key="inputUSD" text="USD"/>
+									<core:Item key="inputRUB" text="RUB"/>
+									<core:Item key="inputEUR" text="EUR"/>
+								</items>
+							</ComboBox>
+							<Button text="Synchronization" press="onSearch" width="12%"/>
+							<Button text="Select Data" press="onSelect" width="12%"/>
+							<Button text="Change Data" press="onChangeData"/>
+						<ToolbarSpacer/>
+					</Toolbar>
+				</l:BlockLayoutCell>
+			</l:BlockLayoutRow> 
+		</l:BlockLayout>
+	</l:VerticalLayout>
+
+	<viz:VizFrame id="idVizFrame" height='50%' width="100%" vizType='line' vizProperties="{title: {text:'Changes in exchange rates'}}">
+		<viz:dataset>
+			<viz.data:FlattenedDataset data="{/ZSP_I_STORAGE}">
+				<viz.data:dimensions>
+					<viz.data:DimensionDefinition name="Date"
+						value="{
+							path: 'erdate',
+							formatter: '.formatter.toDate'
+							}"/>
+				</viz.data:dimensions>				
+				<viz.data:measures>
+					<viz.data:MeasureDefinition name="Rate"
+						value="{
+							path: 'rate'}"
+						/>
+				</viz.data:measures>
+			</viz.data:FlattenedDataset>
+		</viz:dataset>
+		<viz:feeds>
+			<viz.feeds:FeedItem id="valueAxisFeed" uid="valueAxis" type="Measure"
+				values="Rate"/> 
+			<viz.feeds:FeedItem id="categoryAxisFeed" uid="categoryAxis" type="Dimension"
+				values="Date"/>
+		</viz:feeds>
+	</viz:VizFrame>
+
+	<l:VerticalLayout id="containerLayout" width="100%">
+		<l:BlockLayout id="BlockLayout" background="Dashboard">
+			<l:BlockLayoutRow>
+				<l:BlockLayoutCell title="Rates for each period" >
+					<Table
+						id="table"
+						width="auto"
+						items="{
+							path: '/ZSP_C_EXRATE',
+							sorter: {
+								path: 'Currencykey',
+								descending: false
+							}
+						}"
+						noDataText="{worklistView>/No Data Here}"
+						busyIndicatorDelay="{worklistView>/tableBusyDelay}"
+						growing="true"
+						growingThreshold="5"
+						growingScrollToLoad="true"
+						updateFinished=".onUpdateFinished">
+
+					<columns>
+						<Column id="FYear">
+							<Text text="{i18n>Year}" id="TextFYear"/>
+						</Column>
+						<Column id="FPeriod">
+							<Text text="{i18n>Month}" id="TextFPeriod"/>
+						</Column>
+						
+						<Column id="Currencykey">
+							<Text text="{i18n>Currency Key}" id="TextCurrencykey"/>
+						</Column>
+						<Column id="RateType">
+							<Text text="{i18n>Rate Type}" id="TextRateType"/>
+						</Column>
+						<Column id="Rate" hAlign="End">
+							<Text text="{i18n>Rate}" id="TextRare"/>
+						</Column>
+						<Column id="Qty" hAlign="End">
+							<Text text="{i18n>Qty}" id="TextQty"/>
+						</Column>
+						<Column id="ERName" hAlign="End">
+							<Text text="{i18n>ERName}" id="TextERName"/>
+						</Column>
+					</columns>
+
+						<items>
+							<ColumnListItem
+								type="Navigation"
+								press=".onPress">
+								<cells>
+									<ObjectIdentifier
+										title="{Fyear}"/>
+										<ObjectIdentifier
+										title="{Fperiod}"/>
+									<ObjectIdentifier
+										title="{Currencykey}"/>
+									<ObjectIdentifier
+										title="{Ratetype}"/>
+									<ObjectIdentifier
+										title="{
+											path: 'Rate',
+											type: 'sap.ui.model.type.Float',
+											formatter: '.formatterToFloat.toFloat'
+											}"/>
+									<ObjectIdentifier
+										title="{Qty}"/>
+									<ObjectIdentifier
+										title="{ERName}"/>
+								</cells>
+							</ColumnListItem>
+						</items>
+					</Table>
+				</l:BlockLayoutCell>
+			</l:BlockLayoutRow>
+	</l:BlockLayout>
+</l:VerticalLayout>
+
+	</Page>
+</App>
+</mvc:View>

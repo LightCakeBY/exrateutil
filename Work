@@ -1,0 +1,187 @@
+<mvc:View
+    controllerName="exrateutil.controller.AppView"
+	height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+	xmlns:core="sap.ui.core" 
+	xmlns:f="sap.f"
+    xmlns:t="sap.ui.table" 
+	xmlns:viz="sap.viz.ui5.controls" 
+	xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds" 
+	xmlns:sample="test.controller.ChartsOverview"
+    xmlns:goals="test.view.goals"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:l="sap.ui.layout"
+	xmlns:lay="sap.ui.layout.BlockLayout"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified"
+	class="viewPadding"
+	>
+	
+	
+<App id="idApp">
+	<Page id="page" title="{i18n>title}" showHeader="false">
+		<content>
+			<l:VerticalLayout width="100%">
+				<fb:FilterBar header="Exchange Rate Utility" reset="onReset" search="onSearch" showRestoreButton="true" showClearButton="true" useToolbar="false" showFilterConfiguration="false">
+					<fb:filterGroupItems>
+						<fb:FilterGroupItem id ="start_date" groupName="__$INTERNAL$" name="A" label="Start Date" partOfCurrentVariant="true" visibleInFilterBar="true" >
+							<fb:control>
+								<DatePicker/>
+							</fb:control>
+						</fb:FilterGroupItem>
+
+						<fb:FilterGroupItem id ="end_date" groupName="__$INTERNAL$" name="B" label="End Date" partOfCurrentVariant="true" visibleInFilterBar="true">
+							<fb:control>
+								<DatePicker/>
+							</fb:control>
+						</fb:FilterGroupItem>
+
+						<fb:FilterGroupItem id ="currencykey" groupName="__$INTERNAL$" name="C" label="Currency" labelTooltip="Tooltip Example" mandatory="true" partOfCurrentVariant="true" visibleInFilterBar="true">
+							<fb:control>
+								<ComboBox type="Text" change = "onChange" >
+									<items>
+										<core:Item key="inputUSD" text="USD"/>
+										<core:Item key="inputRUB" text="RUB"/>
+										<core:Item key="inputEUR" text="EUR"/>
+									</items>
+								</ComboBox>			
+							</fb:control>		
+						</fb:FilterGroupItem>
+					</fb:filterGroupItems>
+				</fb:FilterBar>
+			</l:VerticalLayout>
+		
+			<viz:VizFrame id="idVizFrame" height='50%' width="100%" vizType='line' vizProperties="{title: {text:'Changes in exchange rates'}}">
+				<viz:dataset>
+					<viz.data:FlattenedDataset data="{/ZSP_I_STORAGE}">
+
+						<viz.data:dimensions>
+							<viz.data:DimensionDefinition name="Date"
+								value="{
+									path: 'erdate',
+									formatter: '.formatter.toDate'
+									}"/>
+						</viz.data:dimensions>
+						
+						<viz.data:measures>
+							<viz.data:MeasureDefinition name="Rate"
+								value="{
+									path: 'rate'}" />
+						</viz.data:measures>
+
+					</viz.data:FlattenedDataset>
+				</viz:dataset>
+
+				<viz:feeds>
+					<viz.feeds:FeedItem id="valueAxisFeed" uid="valueAxis" type="Measure"
+						values="Rate"/> 
+					<viz.feeds:FeedItem id="categoryAxisFeed" uid="categoryAxis" type="Dimension"
+						values="Date" />
+				</viz:feeds>
+
+			</viz:VizFrame>
+
+
+
+		<Table
+			id="table"
+			width="auto"
+			items="{
+				path: '/ZSP_C_EXRATE',
+				sorter: {
+					path: 'Currencykey',
+					descending: false
+				}
+			}"
+			noDataText="{worklistView>/No Data Here}"
+			busyIndicatorDelay="{worklistView>/tableBusyDelay}"
+			growing="true"
+			growingThreshold="5"
+			growingScrollToLoad="true"
+			updateFinished=".onUpdateFinished">
+
+		<headerToolbar>
+			<OverflowToolbar>
+				<Title
+					id="tableHeader"
+					text="{worklistView>/worklistTableTitle}"
+					level="H3"/>
+				<ToolbarSpacer />
+
+				<SearchField
+					id="searchField"
+					tooltip="{i18n>worklistSearchTooltip}"
+					search=".onSearch">
+					<layoutData>
+						<OverflowToolbarLayoutData
+							maxWidth="200px"
+							priority="NeverOverflow"/>
+					</layoutData>
+				</SearchField>
+
+			</OverflowToolbar>
+		</headerToolbar>
+
+		<columns>
+			<Column id="FYear">
+				<Text text="{i18n>Year}" id="TextFYear"/>
+			</Column>
+			<Column id="FPeriod">
+				<Text text="{i18n>Month}" id="TextFPeriod"/>
+			</Column>
+			
+			<Column id="Currencykey">
+				<Text text="{i18n>Currency Key}" id="TextCurrencykey"/>
+			</Column>
+			<Column id="RateType">
+				<Text text="{i18n>Rate Type}" id="TextRateType"/>
+			</Column>
+			<Column id="Rate" hAlign="End">
+				<Text text="{i18n>Rate}" id="TextRare"/>
+			</Column>
+			<Column id="Qty" hAlign="End">
+				<Text text="{i18n>Qty}" id="TextQty"/>
+			</Column>
+			<Column id="ERName" hAlign="End">
+				<Text text="{i18n>ERName}" id="TextERName"/>
+			</Column>
+		</columns>
+
+			<items>
+				<ColumnListItem
+					type="Navigation"
+					press=".onPress">
+					<cells>
+						<ObjectIdentifier
+							title="{Fyear}"/>
+							<ObjectIdentifier
+							title="{Fperiod}"/>
+						<ObjectIdentifier
+							title="{Currencykey}"/>
+						<ObjectIdentifier
+							title="{Ratetype}"/>
+						<ObjectIdentifier
+							title="{
+								path: 'Rate',
+								type: 'sap.ui.model.type.Float',
+								formatter: '.formatterToFloat.toFloat'
+								}"/>
+						<ObjectIdentifier
+							title="{Qty}"/>
+						<ObjectIdentifier
+							title="{ERName}"/>
+					</cells>
+				</ColumnListItem>
+			</items>
+		</Table>
+
+		</content>
+	</Page>
+		
+
+</App>
+	
+</mvc:View>

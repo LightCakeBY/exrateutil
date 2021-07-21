@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:Reference Uri="http://vhcala4hci:50000/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://vhcala4hci:50000/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://vhcala4hci:50000/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://vhcala4hci:50000/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://vhcala4hci:50000/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="cds_zsp_c_exrate_sd" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="ZSP_C_EXRATEType" sap:label="Consumption View" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Fyear"/>
+                    <PropertyRef Name="Fperiod"/>
+                    <PropertyRef Name="Currencykey"/>
+                    <PropertyRef Name="Ratetype"/>
+                </Key>
+                <Property Name="Fyear" Type="Edm.Int32" Nullable="false" sap:label="Integer" sap:quickinfo="Whole Number with +/- Sign (-2.147.483.648 .. 2.147.483.647)"/>
+                <Property Name="Fperiod" Type="Edm.Byte" Nullable="false" sap:label="Byte"/>
+                <Property Name="Currencykey" Type="Edm.String" Nullable="false" MaxLength="5" sap:label="" sap:quickinfo="Data Element for Currency" sap:semantics="currency-code"/>
+                <Property Name="Ratetype" Type="Edm.String" Nullable="false" MaxLength="1" sap:display-format="UpperCase" sap:label="ID" sap:quickinfo="Data element for ID"/>
+                <Property Name="Rate" Type="Edm.Double" sap:label="" sap:quickinfo="Field of type FLTP"/>
+                <Property Name="Qty" Type="Edm.Int32" sap:label="Integer" sap:quickinfo="Whole Number with +/- Sign (-2.147.483.648 .. 2.147.483.647)"/>
+                <Property Name="ERName" Type="Edm.String" sap:display-format="UpperCase" sap:label="Name" sap:quickinfo="Data element for NAME"/>
+            </EntityType>
+            <EntityType Name="ZSP_I_STORAGEType" sap:label="View for store rates" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="erdate"/>
+                    <PropertyRef Name="currencykey"/>
+                </Key>
+                <Property Name="erdate" Type="Edm.DateTime" Nullable="false" Precision="0" sap:display-format="Date" sap:label="Date" sap:quickinfo="Field of type DATS"/>
+                <Property Name="currencykey" Type="Edm.String" Nullable="false" MaxLength="5" sap:label="" sap:quickinfo="Data Element for Currency" sap:semantics="currency-code"/>
+                <Property Name="qty" Type="Edm.Int32" sap:label="Integer" sap:quickinfo="Whole Number with +/- Sign (-2.147.483.648 .. 2.147.483.647)"/>
+                <Property Name="rate" Type="Edm.Double" sap:label="" sap:quickinfo="Field of type FLTP"/>
+            </EntityType>
+            <EntityContainer Name="cds_zsp_c_exrate_sd_Entities" m:IsDefaultEntityContainer="true" sap:message-scope-supported="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="ZSP_C_EXRATE" EntityType="cds_zsp_c_exrate_sd.ZSP_C_EXRATEType" sap:content-version="1"/>
+                <EntitySet Name="ZSP_I_STORAGE" EntityType="cds_zsp_c_exrate_sd.ZSP_I_STORAGEType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+            </EntityContainer>
+            <Annotations Target="cds_zsp_c_exrate_sd.cds_zsp_c_exrate_sd_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Aggregation.ApplySupported">
+                    <Record>
+                        <PropertyValue Property="Transformations">
+                            <Collection>
+                                <String>aggregate</String>
+                                <String>groupby</String>
+                                <String>filter</String>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="Rollup" EnumMember="None"/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="cds_zsp_c_exrate_sd.cds_zsp_c_exrate_sd_Entities/ZSP_C_EXRATE" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="ERName"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SearchExpression"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.SortRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonSortableProperties">
+                            <Collection>
+                                <PropertyPath>ERName</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <atom:link rel="self" href="http://vhcala4hci:50000/sap/opu/odata/sap/ZSP_C_EXRATE_SB/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://vhcala4hci:50000/sap/opu/odata/sap/ZSP_C_EXRATE_SB/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
