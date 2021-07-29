@@ -43,6 +43,7 @@ sap.ui.define([
 				this.getView().setModel(oModel);
 				//Binding the filtered data to the chart by callind it from its ID and binding the data there
 				this.getView().byId("idVizFrame").getDataset().getBinding("data").filter([oFilter]);
+
 			},
 
 			onShow: function(){
@@ -54,7 +55,7 @@ sap.ui.define([
 					var sMessage = "Start date and end date was swapped!";
 					MessageToast.show(sMessage);
 				}
-
+				
 				oModel.callFunction('syncButton', { urlParameters:{
 					Currencykey : currencykey},
 					method:'POST'
