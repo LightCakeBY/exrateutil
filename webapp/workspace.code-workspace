@@ -3,6 +3,9 @@
 		{
 			"name": "testfiori",
 			"path": "..\\..\\..\\testfiori"
+		},
+		{
+			"path": ".."
 		}
 	]
 }

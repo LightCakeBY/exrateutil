@@ -43,19 +43,7 @@ sap.ui.define([
 				this.getView().setModel(oModel);
 				//Binding the filtered data to the chart by callind it from its ID and binding the data there
 				this.getView().byId("idVizFrame").getDataset().getBinding("data").filter([oFilter]);
-
 			},
-
-		/* 	onSynchronization: function (oEvent) {
-
-				oModel.callFunction('syncButton', { urlParameters:{
-					Currencykey : currencykey},
-					method:'POST'
-					 })	
-			var sMessage = "Synchronization was succesfull!";
-			MessageToast.show(sMessage);
-
-			}, */
 
 			onShow: function(){
 
@@ -81,7 +69,7 @@ sap.ui.define([
 					useBatch: true
 					});
 				this.getView().setModel(oModel);
-
+				
 				//Binding the filtered data to the chart by callind it from its ID and binding the data there
 				this.getView().byId("idVizFrame").getDataset().getBinding("data").filter([oFilter,oFilter2]);
 			},

@@ -40,7 +40,9 @@
 		</l:BlockLayout>
 	</l:VerticalLayout>
 
-	<viz:VizFrame id="idVizFrame" height='50%' width="100%" vizType='line' vizProperties="{title: {text:'Changes in exchange rates'}}">
+	<viz:VizFrame id="idVizFrame" height='50%' width="100%" vizType='line' 
+	vizProperties="{title: {text:'Changes in exchange rates'},
+					valueAxis: {label: {formatString: ''}}}" >
 		<viz:dataset>
 			<viz.data:FlattenedDataset data="{/ZSP_I_STORAGE}">
 				<viz.data:dimensions>
@@ -53,7 +55,8 @@
 				<viz.data:measures>
 					<viz.data:MeasureDefinition name="Rate"
 						value="{
-							path: 'rate'}"
+							path: 'rate',
+							formatter: '.formatterToFloat.toFloat'}"
 						/>
 				</viz.data:measures>
 			</viz.data:FlattenedDataset>

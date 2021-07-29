@@ -6,6 +6,5 @@ sap.ui.define([
             return Math.floor(fValue*1000)/1000;
         }
     };
-
 }
 ); 
