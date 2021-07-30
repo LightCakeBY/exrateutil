@@ -11,142 +11,160 @@
 	xmlns:viz.data="sap.viz.ui5.data"
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds" 
 	xmlns:l="sap.ui.layout"
+	xmlns:tnt="sap.tnt"
 	>
 	
-<App id="idApp">
-	<Page id="page" title="{i18n>title}" showHeader="false">
+	
+	<App id="idApp">
+		<Page id="page" title="{i18n>title}" showHeader="false">
+			<IconTabBar id="idIconTabBarNoIcons" >
+				<items>
+					<IconTabFilter text="Main" key="info">
+						<l:VerticalLayout id="vlid" width="100%">
+							<l:BlockLayout id="blid" background="Dashboard">
+								<l:BlockLayoutRow>
+									<l:BlockLayoutCell title="Exchange Rate Utility">
+										<Toolbar>
+											<ToolbarSpacer/>
+												<DatePicker id="startdate" change="onSetStartDate" width="15%" placeholder="Start Date"/>
+												<DatePicker id="enddate" change="onSetEndDate" width="15%" placeholder="End Date"/>
+												<ComboBox change = "onSetCurrency" maxWidth="15%" placeholder="Currency Key"> <!-- //value='USD' -->
+													<items> 
+														<core:Item key="inputUSD" text="USD"/>
+														<core:Item key="inputRUB" text="RUB"/>
+														<core:Item key="inputEUR" text="EUR"/>
+													</items>
+												</ComboBox>
+												<Button text="Show Data" press="onShow" width="15%"/>
+												<Button text="Check Data in console" press="onChangeData"/>
+											<ToolbarSpacer/>
+										</Toolbar>
+									</l:BlockLayoutCell>
+								</l:BlockLayoutRow>
 
-	<l:VerticalLayout id="vlid" width="100%">
-		<l:BlockLayout id="blid" background="Dashboard">
-			<l:BlockLayoutRow>
-				<l:BlockLayoutCell title="Exchange Rate Utility">
-					<Toolbar>
-						<ToolbarSpacer/>
-							<DatePicker id="startdate" change="onSetStartDate" width="12%"/>
-							<DatePicker id="enddate" change="onSetEndDate" width="12%"/>
-							<ComboBox change = "onSetCurrency" maxWidth="12%" value="USD"> <!-- //value='USD' -->
-								<items> 
-									<core:Item key="inputUSD" text="USD"/>
-									<core:Item key="inputRUB" text="RUB"/>
-									<core:Item key="inputEUR" text="EUR"/>
-								</items>
-							</ComboBox>
-							<Button text="Show Data" press="onShow" width="12%"/>
-							<!-- <Button text="Synchronization" press="onSynchronization" width="12%"/> -->
-						<ToolbarSpacer/>
-					</Toolbar>
-				</l:BlockLayoutCell>
-			</l:BlockLayoutRow> 
-		</l:BlockLayout>
-	</l:VerticalLayout>
+								<l:BlockLayoutRow>
+									<l:BlockLayoutCell>
+										<viz:VizFrame id="idVizFrame" width="100%" vizType='line' 
+											vizProperties="{title: {text:'Changes in exchange rates'},
+											valueAxis: {label: {formatString: ''}}}" visible="true">
+												<viz:dataset>
+													<viz.data:FlattenedDataset data="{/ZSP_I_STORAGE}">
+														<viz.data:dimensions>
+															<viz.data:DimensionDefinition name="Date"
+																value="{
+																	path: 'erdate',
+																	formatter: '.formatter.toDate'
+																	}"/>
+														</viz.data:dimensions>				
+														<viz.data:measures>
+															<viz.data:MeasureDefinition name="Rate"
+																value="{
+																	path: 'rate',
+																	formatter: '.formatterToFloat.toFloat'}"
+																/>
+														</viz.data:measures>
+													</viz.data:FlattenedDataset>
+												</viz:dataset>
+												<viz:feeds>
+													<viz.feeds:FeedItem id="valueAxisFeed" uid="valueAxis" type="Measure"
+														values="Rate"/> 
+													<viz.feeds:FeedItem id="categoryAxisFeed" uid="categoryAxis" type="Dimension"
+														values="Date"/>
+												</viz:feeds>
+											</viz:VizFrame>
+									</l:BlockLayoutCell>
+								</l:BlockLayoutRow> 
+							</l:BlockLayout>
+						</l:VerticalLayout>
+					</IconTabFilter>
 
-	<viz:VizFrame id="idVizFrame" height='50%' width="100%" vizType='line' 
-	vizProperties="{title: {text:'Changes in exchange rates'},
-					valueAxis: {label: {formatString: ''}}}" >
-		<viz:dataset>
-			<viz.data:FlattenedDataset data="{/ZSP_I_STORAGE}">
-				<viz.data:dimensions>
-					<viz.data:DimensionDefinition name="Date"
-						value="{
-							path: 'erdate',
-							formatter: '.formatter.toDate'
-							}"/>
-				</viz.data:dimensions>				
-				<viz.data:measures>
-					<viz.data:MeasureDefinition name="Rate"
-						value="{
-							path: 'rate',
-							formatter: '.formatterToFloat.toFloat'}"
-						/>
-				</viz.data:measures>
-			</viz.data:FlattenedDataset>
-		</viz:dataset>
-		<viz:feeds>
-			<viz.feeds:FeedItem id="valueAxisFeed" uid="valueAxis" type="Measure"
-				values="Rate"/> 
-			<viz.feeds:FeedItem id="categoryAxisFeed" uid="categoryAxis" type="Dimension"
-				values="Date"/>
-		</viz:feeds>
-	</viz:VizFrame>
+					<IconTabFilter text="Rate Table" key="ratetab">
+						<Text text="Rate Table will be here soon ..." />
+					</IconTabFilter>
 
-	<l:VerticalLayout id="containerLayout" width="100%">
-		<l:BlockLayout id="BlockLayout" background="Dashboard">
-			<l:BlockLayoutRow>
-				<l:BlockLayoutCell title="Rates for each period" >
-					<Table
-						id="table"
-						width="auto"
-						items="{
-							path: '/ZSP_C_EXRATE',
-							sorter: {
-								path: 'Currencykey',
-								descending: false
-							}
-						}"
-						noDataText="{worklistView>/No Data Here}"
-						busyIndicatorDelay="{worklistView>/tableBusyDelay}"
-						growing="true"
-						growingThreshold="5"
-						growingScrollToLoad="true"
-						updateFinished=".onUpdateFinished">
+					<IconTabFilter text="Rates for each period" key="rateper">
+							<l:VerticalLayout id="containerLayout" width="100%">
+							<l:BlockLayout id="BlockLayout" background="Dashboard">
+								<l:BlockLayoutRow>
+									<l:BlockLayoutCell>
+										<Table
+											id="table"
+											width="auto"
+											items="{
+												path: '/ZSP_C_EXRATE',
+												sorter: {
+													path: 'Currencykey',
+													descending: false
+												}
+											}"
+											noDataText="Something wrong, no data here..."
+											footerText="Synchronize the table or change parameters if you need more rates."
+											busyIndicatorDelay="{worklistView>/tableBusyDelay}"
+											growing="true"
+											growingDirection="Downwards"
+											growingThreshold="3"
+											growingScrollToLoad="false"
+											updateFinished=".onUpdateFinished">
+										<headerToolbar>
+											<Toolbar>
+												<Title text="Last rates for each periods"/>
+												<ToolbarSpacer/>
+												<SearchField width="20%" search="onFilterInvoices" maxLength="3" placeholder="Enter Currency" />
+											</Toolbar>
+										</headerToolbar>
+										<columns>
+											<Column id="FYear"> 
+												<Text text="{i18n>Year}" id="TextFYear"/>
+											</Column>
+											<Column id="FPeriod">
+												<Text text="{i18n>Month}" id="TextFPeriod"/>
+											</Column>
+											<Column id="Currencykey">
+												<Text text="{i18n>Currency Key}" id="TextCurrencykey"/>
+											</Column>
+											<Column id="Rate" hAlign="End">
+												<Text text="{i18n>Rate}" id="TextRare"/>
+											</Column>
+											<Column id="Qty" hAlign="End">
+												<Text text="{i18n>Qty}" id="TextQty"/>
+											</Column>
+											<Column id="ERName" hAlign="End">
+												<Text text="{i18n>ERName}" id="TextERName"/>
+											</Column>
+										</columns>
 
-					<columns>
-						<Column id="FYear">
-							<Text text="{i18n>Year}" id="TextFYear"/>
-						</Column>
-						<Column id="FPeriod">
-							<Text text="{i18n>Month}" id="TextFPeriod"/>
-						</Column>
-						
-						<Column id="Currencykey">
-							<Text text="{i18n>Currency Key}" id="TextCurrencykey"/>
-						</Column>
-						<Column id="RateType">
-							<Text text="{i18n>Rate Type}" id="TextRateType"/>
-						</Column>
-						<Column id="Rate" hAlign="End">
-							<Text text="{i18n>Rate}" id="TextRare"/>
-						</Column>
-						<Column id="Qty" hAlign="End">
-							<Text text="{i18n>Qty}" id="TextQty"/>
-						</Column>
-						<Column id="ERName" hAlign="End">
-							<Text text="{i18n>ERName}" id="TextERName"/>
-						</Column>
-					</columns>
-
-						<items>
-							<ColumnListItem
-								type="Navigation"
-								press=".onPress">
-								<cells>
-									<ObjectIdentifier
-										title="{Fyear}"/>
-										<ObjectIdentifier
-										title="{Fperiod}"/>
-									<ObjectIdentifier
-										title="{Currencykey}"/>
-									<ObjectIdentifier
-										title="{Ratetype}"/>
-									<ObjectIdentifier
-										title="{
-											path: 'Rate',
-											type: 'sap.ui.model.type.Float',
-											formatter: '.formatterToFloat.toFloat'
-											}"/>
-									<ObjectIdentifier
-										title="{Qty}"/>
-									<ObjectIdentifier
-										title="{ERName}"/>
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-				</l:BlockLayoutCell>
-			</l:BlockLayoutRow>
-	</l:BlockLayout>
-</l:VerticalLayout>
-
-	</Page>
-</App>
+											<items>
+												<ColumnListItem
+													type="Navigation"
+													press=".onPress">
+													<cells>
+														<ObjectIdentifier
+															title="{Fyear}"/>
+															<ObjectIdentifier
+															title="{Fperiod}"/>
+														<ObjectIdentifier
+															title="{Currencykey}"/>
+														<ObjectIdentifier
+															title="{
+																path: 'Rate',
+																type: 'sap.ui.model.type.Float',
+																formatter: '.formatterToFloat.toFloat'
+																}"/>
+														<ObjectIdentifier
+															title="{Qty}"/>
+														<ObjectIdentifier
+															title="{ERName}"/>
+													</cells>
+												</ColumnListItem>
+											</items>
+										</Table>
+									</l:BlockLayoutCell>
+								</l:BlockLayoutRow>
+							</l:BlockLayout>
+						</l:VerticalLayout>
+					</IconTabFilter>
+				</items>
+			</IconTabBar>
+		</Page>
+	</App>
 </mvc:View>
